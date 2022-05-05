@@ -10,9 +10,19 @@ async function main() {
     const handle = app.getRequestHandler();
     const server = express();
     server
-      .get("*", (req, res) => {
-        const url = parse(req.url, true);
-        handle(req, res, url);
+      .get("/", (req, res) => {
+        res.send("Hello World!");
+      })
+      .get("/about", (req, res) => {
+        const { query } = parse(req.url, true);
+        app.render(req, res, "/about", query);
+      })
+      .get("/api/greet", (req, res) => {
+        res.json({ name: req.query?.name ?? "unknown" });
+      })
+      .get(/_next\/.+/, (req, res) => {
+        const parsedUrl = parse(req.url, true);
+        handle(req, res, parsedUrl);
       })
       .listen(3000, () => console.log("server ready"));
   } catch (err) {
